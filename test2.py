@@ -226,8 +226,7 @@ class UpdateChecker(QThread):
         super().__init__()
         self.current_version = current_version
         self.check_interval = check_interval  # Intervalle de vérification en secondes
-        self.github_api_url = "https://api.github.com/repos/votrecompte/youtube-downloader/releases/latest"
-        self.download_url = "https://github.com/votrecompte/youtube-downloader/releases/latest/download/YouTubeDownloader.exe"
+        self.github_api_url = "https://api.github.com/repos/leg234-png/Youtube-Downloader/releases/latest"
 
     def run(self):
         while True:
@@ -238,7 +237,16 @@ class UpdateChecker(QThread):
                 latest_version = latest_release['tag_name'].lstrip('v')
 
                 if version.parse(latest_version) > version.parse(self.current_version):
-                    self.update_available.emit(latest_version, self.download_url)
+                    download_url = None
+                    for asset in latest_release['assets']:
+                        if asset['name'] == 'YouTubeDownloader.exe':
+                            download_url = asset['browser_download_url']
+                            break
+                    
+                    if download_url:
+                        self.update_available.emit(latest_version, download_url)
+                    else:
+                        self.error.emit("Fichier de mise à jour non trouvé")
                 
                 self.sleep(self.check_interval)
             except Exception as e:
