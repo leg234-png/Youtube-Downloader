@@ -5,7 +5,7 @@ import requests
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, 
                              QPushButton, QProgressBar, QFileDialog, QLabel, QMessageBox, 
                              QComboBox)
-from PyQt5.QtCore import QThread, pyqtSignal, Qt, QSize
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, QSize, QTimer
 from PyQt5.QtGui import QIcon, QPixmap, QMovie
 import yt_dlp
 
@@ -164,6 +164,7 @@ class DownloadThread(QThread):
         self.stopped = True
         if self.ydl:
             self.ydl.params['abort'] = True
+        self.terminate()  # Forcer l'arrêt du thread si nécessaire
 
 class YouTubeDownloader(QWidget):
     def __init__(self):
@@ -172,13 +173,16 @@ class YouTubeDownloader(QWidget):
         self.is_playlist = False
         self.thumbnail_thread = None
         self.download_thread = None
+        self.preview_timer = QTimer(self)
+        self.preview_timer.timeout.connect(self.start_validate_url)
+        self.preview_timer.setSingleShot(True)
 
     def initUI(self):
         layout = QVBoxLayout()
 
         url_layout = QHBoxLayout()
         self.url_input = QLineEdit()
-        self.url_input.textChanged.connect(self.start_validate_url)
+        self.url_input.textChanged.connect(self.on_url_changed)
         url_layout.addWidget(QLabel("URL:"))
         url_layout.addWidget(self.url_input)
         layout.addLayout(url_layout)
@@ -230,6 +234,9 @@ class YouTubeDownloader(QWidget):
         self.setLayout(layout)
         self.setWindowTitle('YouTube Downloader')
         self.setGeometry(300, 300, 400, 450)
+
+    def on_url_changed(self):
+        self.preview_timer.start(500)  # Démarrer le timer pour 500ms
 
     def start_validate_url(self):
         if self.thumbnail_thread and self.thumbnail_thread.isRunning():
@@ -333,7 +340,10 @@ class YouTubeDownloader(QWidget):
     def stop_download(self):
         if self.download_thread:
             self.download_thread.stop()
-            self.download_thread.wait()
+            self.download_thread.wait(5000)  # Attendre 5 secondes max
+            if self.download_thread.isRunning():
+                self.download_thread.terminate()
+                self.download_thread.wait()
         self.download_btn.setEnabled(True)
         self.pause_resume_btn.setEnabled(False)
         self.stop_btn.setEnabled(False)
