@@ -1,0 +1,7 @@
+2024-09-26 03:43:32,287 - INFO - Téléchargement terminé avec succès
+2024-09-26 04:12:55,588 - ERROR - Error in UpdateChecker: 404 Client Error: Not Found for url: https://api.github.com/repos/votrecompte/youtube-downloader/releases/latest
+2024-09-26 04:12:55,589 - ERROR - Erreur lors de la vérification des mises à jour : 404 Client Error: Not Found for url: https://api.github.com/repos/votrecompte/youtube-downloader/releases/latest
+2024-09-26 04:12:55,591 - INFO - Erreur lors de la vérification des mises à jour : 404 Client Error: Not Found for url: https://api.github.com/repos/votrecompte/youtube-downloader/releases/latest
+2024-09-26 04:14:43,479 - INFO - Téléchargement mis en pause
+2024-09-26 04:14:49,610 - INFO - Téléchargement repris
+2024-09-26 04:14:57,738 - INFO - Téléchargement terminé avec succès
